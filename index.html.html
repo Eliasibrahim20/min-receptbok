@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReceptHörnan</title>
+<style>
+:root {
+ --site-primary:#28634B; --site-on-primary:#FFFFFF;
+ --site-secondary:#E7F0E9; --site-on-secondary:#183A2A;
+ --site-background:#F7F8F4; --site-on-background:#202720;
+ --site-font-body:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+ --site-font-heading:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+ --site-heading-scale:1; --site-spacing-scale:1; --site-radius-scale:1;
+ --site-decoration-opacity:1;
+ --surface:#FFFFFF;
+ --muted:#4F5D52;
+ --border:#CFD8D0;
+ --soft:#EDF3EE;
+}
+* {box-sizing:border-box}
+body {margin:0;font-family:var(--site-font-body);background:var(--site-background);color:var(--site-on-background);color-scheme:light}
+#app {min-height:100vh;background-color:var(--site-background);color:var(--site-on-background);border-radius:0}
+header {background:linear-gradient(125deg,#174832,#347b58 70%,#5b9569);color:var(--site-on-primary);padding:calc(28px * var(--site-spacing-scale)) max(20px,calc((100vw - 1120px)/2));box-shadow:0 8px 24px #183a2a18}
+.top {display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand {display:flex;gap:12px;align-items:center;font-size:1.15rem;font-weight:800;letter-spacing:-.03em}
+.logo {display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#ffffff24;font-size:23px}
+header p {margin:7px 0 0;opacity:.85;font-size:.94rem}
+main {max-width:1120px;margin:auto;padding:28px 20px 56px}
+.tabs {display:flex;gap:8px;overflow:auto;padding:0 0 18px;margin-bottom:22px;border-bottom:1px solid var(--border)}
+.tab {white-space:nowrap;border:1px solid var(--border);border-radius:999px;padding:10px 15px;background:var(--surface);color:var(--site-on-background);cursor:pointer;font-weight:650}
+.tab.active {background:var(--site-primary);color:var(--site-on-primary);border-color:var(--site-primary)}
+h1,h2,h3 {font-family:var(--site-font-heading);letter-spacing:-.035em}
+h1 {font-size:calc(2rem * var(--site-heading-scale));margin:0 0 8px}
+h2 {font-size:calc(1.35rem * var(--site-heading-scale));margin:0 0 14px}
+h3 {font-size:1.05rem;margin:0 0 8px}
+p {line-height:1.55}
+.muted {color:var(--muted)}
+.panel {background:var(--surface);border:1px solid var(--border);border-radius:calc(22px * var(--site-radius-scale));padding:calc(22px * var(--site-spacing-scale));margin-bottom:20px;box-shadow:0 5px 18px #1b352508}
+.grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+label {display:block;font-size:.9rem;font-weight:650;margin-bottom:7px}
+input,textarea,select {width:100%;padding:12px 13px;border:1px solid #AAB8AC;border-radius:12px;background:#FFFFFF;color:#17231B;font:inherit;color-scheme:light}
+input::placeholder,textarea::placeholder {color:#68736A;opacity:1}
+input,textarea {caret-color:var(--site-primary)}
+textarea {min-height:92px;resize:vertical}
+button {font:inherit}
+.btn {border:0;border-radius:13px;padding:12px 17px;background:var(--site-primary);color:var(--site-on-primary);font-weight:750;cursor:pointer;transition:filter .15s,transform .15s}
+.btn.secondary {background:var(--site-secondary);color:var(--site-on-secondary)}
+.btn.ghost {background:#FFFFFF;color:#202720;border:1px solid #AAB8AC}
+.actions {display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.results {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.recipe {overflow:hidden;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:0 5px 18px #1b352508;transition:transform .18s,box-shadow .18s}
+.recipe-art {height:175px;display:grid;place-items:center;background:var(--site-secondary);font-size:48px}
+.recipe-art img {width:100%;height:100%;object-fit:cover;display:block}
+.recipe-body {padding:15px}
+.recipe-body p {margin:6px 0 10px;font-size:.92rem}
+.pill {display:inline-block;background:var(--soft);border-radius:999px;padding:5px 9px;font-size:.78rem;color:var(--muted)}
+.row {display:flex;align-items:center;justify-content:space-between;gap:10px}
+ul,ol {padding-left:22px;line-height:1.75}
+li {margin:3px 0}
+.checkline {display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.checkline input {width:auto;margin-top:5px;accent-color:var(--site-primary)}
+.checkline.done span {text-decoration:line-through;color:var(--muted)}
+.day {display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.day:last-child {border:0}
+.day strong {color:var(--site-primary)}
+.hidden {display:none!important}
+.notice {padding:12px 14px;background:var(--soft);border-radius:12px;color:var(--muted);font-size:.9rem}
+.account-bar {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.account-status {padding:10px 13px;background:var(--soft);border-radius:12px;font-size:.9rem}
+.small {font-size:.9rem}
+input:focus,textarea:focus,select:focus,button:focus-visible {outline:3px solid #83B99A;outline-offset:2px}
+.btn:hover {filter:brightness(.94)}
+.recipe-body h3,.recipe-body p,.panel p,.panel li {overflow-wrap:anywhere}
+@media(max-width:650px){main{padding:18px 13px 36px}.grid,.results{grid-template-columns:1fr}.panel{padding:16px}.day{grid-template-columns:66px 1fr}.day .btn{grid-column:2;justify-self:start}header{padding:18px 16px}h1{font-size:1.7rem}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+ <div class="top"><div class="brand"><div class="logo">🥘</div><div>ReceptHörnan<div style="font-size:.78rem;font-weight:500;opacity:.82;letter-spacing:0">Mat som passar det du har hemma</div></div></div><span aria-hidden="true" style="font-size:30px">🥕</span></div>
+ <p>Enkel matlagning, en sak i taget.</p>
+</header>
+<main>
+ <nav class="tabs" aria-label="Huvudmeny">
+  <button class="tab active" data-page="home">🏠 Start</button>
+  <button class="tab" data-page="recipes">🍝 Recept</button>
+  <button class="tab" data-page="myrecipes">✍️ Mina recept (ändra/radera)</button>
+  <button class="tab" data-page="week">📅 Veckomeny</button>
+  <button class="tab" data-page="shopping">🛒 Inköpslista</button>
+  <button class="tab" data-page="favorites">❤️ Favoriter</button>
+  <button class="tab" data-page="account">👤 Konto</button>
+ </nav>
+ <section id="page-login-gate" class="hidden">
+  <div class="panel" style="max-width:520px;margin:24px auto;text-align:center">
+   <h1>👤 Logga in först</h1>
+   <p class="muted">Du behöver logga in eller skapa ett konto för att använda ReceptHörnan.</p>
+   <div class="actions" style="justify-content:center"><button class="btn" id="gateSignup">Skapa konto</button><button class="btn secondary" id="gateLogin">Logga in</button></div>
+   <p class="small muted">Obs! Kontot är fortfarande en lokal prototyp och fungerar bara i den här webbläsaren.</p>
+  </div>
+ </section>
+ <section id="page-home">
+  <div class="panel">
+   <h1>Vad har du hemma?</h1>
+   <p class="muted">Hitta goda middagar av det du redan har. Skriv ingredienserna så letar vi fram recept som passar.</p>
+   <label for="pantry">Dina ingredienser</label>
+   <textarea id="pantry" placeholder="Exempel: pasta, kyckling, grädde, lök"></textarea>
+   <div class="actions"><button class="btn" id="findRecipes">Hitta recept</button><button class="btn secondary" id="fillExample">Prova exempel</button></div>
+  </div>
+  <div class="grid">
+   <div class="panel"><h2>✨ Hitta en middagsidé</h2><p class="muted">Osäker på vad du ska laga? Få ett enkelt förslag från receptsamlingen.</p><button class="btn" id="makeAI">Ge mig ett receptförslag</button><p class="small muted">Förslaget kommer från appens receptsamling. Ingen extern AI-tjänst är ansluten ännu.</p></div>
+   <div class="panel"><h2>💡 Dagens tips</h2><p>Välj en maträtt, läs igenom stegen och plocka fram ingredienserna innan du börjar.</p><span class="pill">Lugnt och enkelt</span></div>
+  </div>
+  <div id="homeResults"></div>
+ </section>
+ <section id="page-recipes" class="hidden">
+  <div class="row"><div><h1>Recept</h1><p class="muted">Enkla vardagsrätter med tydliga steg.</p></div></div>
+  <div class="grid" style="margin-bottom:16px"><div><label for="search">Sök recept</label><input id="search" placeholder="T.ex. pasta eller kyckling"></div><div><label for="filter">Kategori</label><select id="filter"><option value="all">Alla recept</option><option value="pasta">Pasta</option><option value="korv">Korv</option><option value="kyckling">Kyckling</option><option value="vegetariskt">Vegetariskt</option><option value="egna">Mina egna recept</option></select></div></div>
+  <div id="allRecipes" class="results"></div>
+ </section>
+ <section id="page-myrecipes" class="hidden">
+  <h1>✍️ Mina egna recept</h1><p class="muted">Här kan du lägga till, ändra eller radera dina recept. Knapparna ÄNDRA och RADERA finns under varje recept du har sparat.</p>
+  <form id="recipeForm" class="panel">
+   <div class="grid"><div><label for="myName">Vad heter receptet?</label><input id="myName" required maxlength="100" placeholder="T.ex. Elias krämiga pasta"></div><div><label for="myTime">Hur lång tid tar det?</label><input id="myTime" maxlength="40" placeholder="T.ex. 20 minuter"></div></div>
+   <div style="margin-top:14px"><label for="myIngredients">Ingredienser</label><textarea id="myIngredients" required placeholder="Skriv en ingrediens per rad, t.ex.\n200 g pasta\n2 dl grädde\n1 lök"></textarea></div>
+   <div style="margin-top:14px"><label for="mySteps">Gör så här</label><textarea id="mySteps" required placeholder="Skriv ett steg per rad, t.ex.\nKoka pastan.\nStek löken.\nBlanda allt tillsammans."></textarea></div>
+   <div style="margin-top:14px"><label for="myNotes">Extra tips (valfritt)</label><textarea id="myNotes" placeholder="Skriv egna tips här"></textarea></div>
+   <div class="actions"><button class="btn" type="submit">💾 Spara recept</button><button class="btn ghost" type="reset">Rensa formuläret</button></div>
+   <p class="small muted">Recepten sparas på den här enheten och i den här webbläsaren. De synkas inte automatiskt mellan olika enheter.</p>
+  </form>
+  <h2>Recept jag har skrivit</h2><p class="notice">Hitta receptet i listan nedanför. Tryck på <strong>Ändra</strong> för att redigera det eller <strong>Radera</strong> för att ta bort det.</p><div id="myRecipeList" class="results"></div>
+ </section>
+ <section id="page-week" class="hidden">
+  <h1>Veckomeny</h1><p class="muted">Ett förslag på sju enkla middagar. Byt gärna ut rätter efter vad du har hemma.</p>
+  <div class="panel"><div class="row"><h2>Din vecka</h2><button class="btn secondary" id="newWeek">Byt meny</button></div><div id="weekList"></div><div class="actions"><button class="btn" id="weekShopping">Lägg ingredienser på inköpslistan</button></div></div>
+ </section>
+ <section id="page-shopping" class="hidden">
+  <h1>Inköpslista</h1><p class="muted">Bocka av saker medan du handlar.</p>
+  <div class="panel"><div class="row"><h2>Det du behöver</h2><button class="btn ghost" id="clearChecked">Ta bort avbockade</button></div><div id="shoppingItems"></div>
+   <div class="grid" style="margin-top:16px"><div><label for="newItem">Lägg till vara</label><input id="newItem" placeholder="T.ex. mjölk"></div><div style="align-self:end"><button class="btn" id="addItem">Lägg till</button></div></div>
+   <div class="actions"><button class="btn secondary" id="copyList">Kopiera lista</button></div>
+  </div>
+ </section>
+ <section id="page-favorites" class="hidden">
+  <h1>Favoriter ❤️</h1><p class="muted">Spara recept du vill laga igen.</p><div id="favoriteRecipes" class="results"></div>
+ </section>
+ <section id="page-account" class="hidden">
+  <h1>👤 Mitt konto</h1>
+  <div class="panel">
+   <h2>Spara dina recept på ditt eget konto</h2>
+   <div class="actions"><button class="btn" id="showSignup">Skapa konto</button><button class="btn secondary" id="showLogin">Logga in</button></div>
+   <div id="accountForms" class="hidden" style="margin-top:18px">
+    <h3 id="accountFormTitle">Skapa konto</h3>
+    <p class="notice">Det här är en lokal demonstration. Kontot fungerar bara i den här webbläsaren och synkar inte mellan enheter. Använd inte ett lösenord som du använder någon annanstans.</p>
+    <form id="localAccountForm">
+     <div style="margin-top:12px"><label for="accountEmail">E-postadress</label><input id="accountEmail" type="email" autocomplete="username" required placeholder="du@exempel.se"></div>
+     <div style="margin-top:12px"><label for="accountPassword">Lösenord (minst 8 tecken)</label><input id="accountPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Minst 8 tecken"></div>
+     <div class="actions"><button class="btn" type="submit" id="accountSubmit">Skapa konto</button><button class="btn ghost" type="button" id="cancelAccountForm">Avbryt</button></div>
+    </form>
+   </div>
+   <div id="signedInPanel" class="hidden" style="margin-top:18px"><p id="signedInMessage"></p><button class="btn ghost" id="logoutButton">Logga ut</button></div>
+   <p id="accountMessage" role="status" aria-live="polite"></p>
+   <p>För att logga in på riktigt och kunna se dina recept på flera mobiler och datorer behöver webbplatsen kopplas till en säker kontotjänst och databas.</p>
+   <p class="notice"><strong>Viktigt:</strong> Knapparna ovan är en lokal prototyp, inte en säker riktig inloggning. Recept sparas fortfarande i webbläsaren. För personliga konton och synk mellan enheter måste webbplatsen kopplas till en säker inloggningstjänst och databas.</p>
+   <h3>Vad som behövs för att aktivera det</h3>
+   <ol><li>Skapa en säker inloggningstjänst.</li><li>Koppla varje konto till en egen samling recept.</li><li>Spara recept i en databas så att de följer med när du loggar in på en annan enhet.</li></ol>
+   <p class="muted small">När detta är kopplat kan kontot även spara favoriter, veckomeny och inköpslista separat för varje användare.</p>
+  </div>
+ </section>
+ <div id="detail" class="panel hidden"></div>
+ <p class="small muted">Första versionen · Dina favoriter och inköpslistan sparas i den här webbläsaren på den här enheten.</p>
+</main>
+</div>
+<script>
+const recipes = [
+ {id:'creamy-pasta',name:'Krämig köttfärspasta',category:'pasta',emoji:'🍝',time:'25 min',servings:2,ingredients:['200 g pasta','250 g köttfärs','2 dl matgrädde','1 liten lök','2 msk tomatpuré','salt och peppar'],steps:['Koka pastan enligt förpackningen.','Hacka löken och stek den med köttfärsen tills köttet är genomstekt.','Rör ner tomatpuré och matgrädde. Låt sjuda i 5–7 minuter.','Smaka av med salt och peppar. Blanda med pastan.']},
+ {id:'korvstroganoff',name:'Falukorvstroganoff',category:'korv',emoji:'🍲',time:'20 min',servings:2,ingredients:['300 g falukorv','1 liten lök','2 dl matgrädde','2 msk tomatpuré','2 portioner ris','lite olja'],steps:['Koka riset enligt förpackningen.','Skär falukorv och lök i bitar.','Stek lök och falukorv i lite olja.','Rör ner tomatpuré och grädde. Låt sjuda i 5 minuter.','Servera med ris.']},
+ {id:'chicken',name:'Krämig kyckling med ris',category:'kyckling',emoji:'🍗',time:'30 min',servings:2,ingredients:['250–300 g kycklingfilé','2 dl matgrädde','1 liten lök','2 portioner ris','1 tsk buljong','lite olja'],steps:['Koka riset.','Skär kycklingen i mindre bitar. Tvätta händer och redskap efter rå kyckling.','Stek kycklingen tills den är helt genomstekt.','Tillsätt hackad lök, grädde och buljong. Låt sjuda 5–10 minuter.','Servera med ris.']},
+ {id:'tomato-pasta',name:'Pasta med tomatsås',category:'pasta',emoji:'🍅',time:'15 min',servings:2,ingredients:['200 g pasta','1 förpackning krossade tomater','1 msk tomatpuré','1 vitlöksklyfta','1 msk olja','salt och peppar'],steps:['Koka pastan.','Hacka eller pressa vitlöken. Stek den försiktigt i olja i en kastrull.','Tillsätt krossade tomater och tomatpuré. Låt sjuda i 8–10 minuter.','Smaka av och blanda med pastan.']},
+ {id:'meatballs',name:'Köttbullar och makaroner',category:'pasta',emoji:'🍝',time:'15 min',servings:2,ingredients:['200 g makaroner','250 g köttbullar','lite smör eller olja','ketchup om du vill'],steps:['Koka makaronerna enligt förpackningen.','Stek köttbullarna tills de är varma rakt igenom.','Häll av makaronerna och blanda med lite smör om du vill.','Servera tillsammans.']},
+ {id:'halloumi',name:'Halloumi med tomatris',category:'vegetariskt',emoji:'🧀',time:'25 min',servings:2,ingredients:['200 g halloumi','2 portioner ris','1 förpackning krossade tomater','1 liten lök','lite olja'],steps:['Koka riset.','Skär halloumin i bitar och stek gyllene. Lägg åt sidan.','Stek hackad lök och tillsätt krossade tomater. Låt sjuda 8 minuter.','Vänd ner halloumin och servera med ris.']},
+ {id:'bacon-mac',name:'Makaroner med bacon',category:'pasta',emoji:'🥓',time:'15 min',servings:2,ingredients:['200 g makaroner','140 g bacon','1 dl matgrädde (valfritt)','svartpeppar'],steps:['Koka makaronerna.','Skär bacon i bitar och stek tills det är genomstekt.','Häll av makaronerna och blanda med bacon.','Rör ner grädde om du vill ha en krämigare rätt. Krydda med peppar.']},
+ {id:'veggie-omelette',name:'Enkel omelett',category:'vegetariskt',emoji:'🍳',time:'10 min',servings:1,ingredients:['2 ägg','2 msk mjölk','lite ost','salt och peppar','lite smör'],steps:['Vispa ihop ägg, mjölk, salt och peppar.','Smält smör i en stekpanna på medelvärme.','Häll i äggblandningen. Lyft försiktigt kanterna när den stelnar.','Lägg på ost och vik ihop omeletten när den nästan stelnat.']},
+ {id:'taco-bowl',name:'Tacobowl med ris',category:'kyckling',emoji:'🌮',time:'20 min',servings:2,ingredients:['2 portioner ris','250 g köttfärs eller kyckling','1 påse tacokrydda','1 dl majs','tacosås'],steps:['Koka riset enligt förpackningen.','Stek köttfärs tills den är genomstekt, eller tillaga kyckling helt igenom.','Tillsätt tacokrydda och lite vatten enligt förpackningen.','Servera i skålar med ris, majs och tacosås.']},
+ {id:'creamy-bacon-pasta',name:'Krämig baconpasta',category:'pasta',emoji:'🥓',time:'20 min',servings:2,ingredients:['200 g pasta','140 g bacon','2 dl matgrädde','svartpeppar','lite riven ost (valfritt)'],steps:['Koka pastan enligt förpackningen.','Skär bacon i bitar och stek tills det är genomstekt.','Häll i grädden och låt sjuda några minuter.','Blanda med pastan och toppa eventuellt med ost.']},
+ {id:'tomato-egg-rice',name:'Tomatris med ägg',category:'vegetariskt',emoji:'🍅',time:'20 min',servings:1,ingredients:['1 portion ris','2 ägg','200 g krossade tomater','1 liten vitlöksklyfta (valfritt)','salt och peppar'],steps:['Koka riset.','Värm krossade tomater i en kastrull med salt och peppar.','Stek äggen i en stekpanna tills vitan stelnat.','Servera tomatsåsen och äggen över riset.']},
+ {id:'garlic-chicken-pasta',name:'Vitlökskyckling med pasta',category:'kyckling',emoji:'🍗',time:'25 min',servings:2,ingredients:['200 g pasta','250 g kycklingfilé','2 dl matgrädde','1 vitlöksklyfta','lite olja','salt och peppar'],steps:['Koka pastan.','Skär kycklingen i bitar och stek tills den är helt genomstekt.','Tillsätt vitlök och grädde och låt sjuda några minuter.','Smaka av och servera såsen med pastan.']},
+ {id:'potato-egg-pan',name:'Potatispanna med ägg',category:'vegetariskt',emoji:'🥔',time:'25 min',servings:2,ingredients:['4 kokta potatisar','3 ägg','1 liten lök','lite olja','salt och peppar'],steps:['Skär den kokta potatisen och löken i bitar.','Stek löken mjuk i lite olja och lägg i potatisen.','Vispa äggen med salt och peppar och häll över.','Stek på låg värme tills äggen har stelnat.']}
+];
+const weekOptions=[['Måndag','creamy-pasta'],['Tisdag','korvstroganoff'],['Onsdag','chicken'],['Torsdag','tomato-pasta'],['Fredag','halloumi'],['Lördag','meatballs'],['Söndag','bacon-mac']];
+const $=s=>document.querySelector(s);
+const getSaved=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
+let favorites=getSaved('elias-favorites',[]);
+let myRecipes=getSaved('elias-my-recipes',[]);
+let deletedRecipes=getSaved('elias-deleted-recipes',[]);
+let shopping=getSaved('elias-shopping',[]);
+let week=getSaved('elias-week',weekOptions.map(x=>x[1]));
+let currentResults=[];
+let localAccount=getSaved('elias-local-account',null);
+let localSession=getSaved('elias-local-session',null);
+function accountStoreKey(){return localSession?'elias-account-data-'+localSession.email:''}
+function loadAccountData(){if(!localSession)return;const d=getSaved(accountStoreKey(),null);if(d){favorites=d.favorites||[];myRecipes=d.myRecipes||[];deletedRecipes=d.deletedRecipes||[];shopping=d.shopping||[];week=d.week||weekOptions.map(x=>x[1])}}
+function saveAccountData(){if(localSession)localStorage.setItem(accountStoreKey(),JSON.stringify({favorites,myRecipes,deletedRecipes,shopping,week}))}
+function renderAccount(){const signed=!!localSession;$('#accountForms').classList.add('hidden');$('#signedInPanel').classList.toggle('hidden',!signed);$('#showSignup').classList.toggle('hidden',signed);$('#showLogin').classList.toggle('hidden',signed);if(signed)$('#signedInMessage').textContent='Du är inloggad som '+localSession.email+'.';}
+function openAccountForm(mode){$('#accountForms').classList.remove('hidden');$('#accountFormTitle').textContent=mode==='signup'?'Skapa konto':'Logga in';$('#accountSubmit').textContent=mode==='signup'?'Skapa konto':'Logga in';$('#accountPassword').value='';$('#accountPassword').setAttribute('autocomplete',mode==='signup'?'new-password':'current-password');$('#localAccountForm').dataset.mode=mode;$('#accountMessage').textContent='';}
+$('#showSignup').addEventListener('click',()=>openAccountForm('signup'));
+$('#showLogin').addEventListener('click',()=>openAccountForm('login'));
+$('#gateSignup').addEventListener('click',()=>{showPage('account');openAccountForm('signup')});
+$('#gateLogin').addEventListener('click',()=>{showPage('account');openAccountForm('login')});
+$('#cancelAccountForm').addEventListener('click',()=>$('#accountForms').classList.add('hidden'));
+$('#localAccountForm').addEventListener('submit',e=>{e.preventDefault();const email=$('#accountEmail').value.trim().toLowerCase(),password=$('#accountPassword').value,mode=$('#localAccountForm').dataset.mode;if(mode==='signup'){if(localAccount){$('#accountMessage').textContent='Den här prototypen kan bara ha ett lokalt konto. Logga in eller använd en riktig kontotjänst.';return}localAccount={email,password};localStorage.setItem('elias-local-account',JSON.stringify(localAccount));localSession={email};localStorage.setItem('elias-local-session',JSON.stringify(localSession));saveAccountData();$('#accountMessage').textContent='Lokalt konto skapat. Kom ihåg att det inte är ett säkert konto och synkas inte mellan enheter.';}else{if(!localAccount||localAccount.email!==email||localAccount.password!==password){$('#accountMessage').textContent='E-postadressen eller lösenordet stämmer inte, eller så finns inget lokalt konto ännu.';return}localSession={email};localStorage.setItem('elias-local-session',JSON.stringify(localSession));loadAccountData();$('#accountMessage').textContent='Du är inloggad i den lokala prototypen.';}renderAccount();$('#localAccountForm').reset();renderRecipes();renderMyRecipes();renderFavorites();renderShopping();renderWeek();});
+$('#logoutButton').addEventListener('click',()=>{saveAccountData();localSession=null;localStorage.removeItem('elias-local-session');renderAccount();$('#accountMessage').textContent='Du har loggat ut. Dina lokala uppgifter finns kvar i webbläsaren.';});
+function allRecipes(){return [...recipes.filter(r=>!deletedRecipes.includes(r.id)),...myRecipes]}
+function save(){localStorage.setItem('elias-favorites',JSON.stringify(favorites));localStorage.setItem('elias-shopping',JSON.stringify(shopping));localStorage.setItem('elias-week',JSON.stringify(week));localStorage.setItem('elias-my-recipes',JSON.stringify(myRecipes));localStorage.setItem('elias-deleted-recipes',JSON.stringify(deletedRecipes));saveAccountData()}
+function showPage(name){if(!localSession&&name!=='account'){name='login-gate'}document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden'));$('#page-'+name).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.page===(name==='login-gate'?'account':name)));$('#detail').classList.add('hidden');if(name==='recipes')renderRecipes();if(name==='myrecipes')renderMyRecipes();if(name==='week')renderWeek();if(name==='shopping')renderShopping();if(name==='favorites')renderFavorites();if(name==='account')renderAccount();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+const foodPhotos={'pasta':'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=80','chicken':'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=900&q=80','vegetariskt':'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80','korv':'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80'};
+function recipeCard(r){return `<article class="recipe"><div class="recipe-art">${r.category==='egna'?'📝':`<img loading="lazy" alt="Matbild: ${escapeHTML(r.name)}" src="${r.photo||foodPhotos[r.category]||foodPhotos.pasta}" onerror="this.style.display='none';this.parentElement.textContent='${r.emoji}'">`}</div><div class="recipe-body"><div class="row"><span class="pill">${escapeHTML(r.time||'Tid ej angiven')}</span><button class="btn ghost" style="padding:6px 9px" data-fav="${r.id}" aria-label="Spara favorit">${favorites.includes(r.id)?'❤️':'♡'}</button></div><h3 style="margin-top:10px">${escapeHTML(r.name)}</h3><p class="muted">${r.ingredients.slice(0,3).map(escapeHTML).join(' · ')}${r.ingredients.length>3?' …':''}</p><div class="actions"><button class="btn" data-open="${r.id}">Visa recept</button><button class="btn secondary" data-edit="${r.id}">Ändra recept</button><button class="btn ghost" data-delete="${r.id}">Radera recept</button></div></div></article>`}
+function bindCards(root){root.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>showRecipe(b.dataset.open)));root.querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click',()=>toggleFavorite(b.dataset.fav)));root.querySelectorAll('[data-myedit]').forEach(b=>b.addEventListener('click',()=>editMyRecipe(b.dataset.myedit)));root.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{if(myRecipes.some(r=>r.id===b.dataset.edit))editMyRecipe(b.dataset.edit);else showRecipe(b.dataset.edit)}));root.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecipe(b.dataset.delete)));root.querySelectorAll('[data-mydelete]').forEach(b=>b.addEventListener('click',()=>deleteRecipe(b.dataset.mydelete)))}
+function renderRecipes(){let q=($('#search').value||'').toLowerCase(),c=$('#filter').value;let list=allRecipes().filter(r=>(c==='all'||r.category===c)&&(r.name+' '+r.ingredients.join(' ')).toLowerCase().includes(q));$('#allRecipes').innerHTML=list.length?list.map(recipeCard).join(''):'<p class="muted">Inga recept hittades. Prova ett annat sökord.</p>';bindCards($('#allRecipes'))}
+function showRecipe(id){let r=allRecipes().find(x=>x.id===id);if(!r)return;$('#detail').classList.remove('hidden');$('#detail').innerHTML=`<div class="row"><h2>${r.emoji||'📝'} ${escapeHTML(r.name)}</h2><button class="btn ghost" id="closeDetail">Stäng</button></div><p class="muted">${escapeHTML(r.time||'Tid ej angiven')}${r.servings?' · '+r.servings+' portioner':''}</p><h3>Ingredienser</h3><ul>${r.ingredients.map(i=>`<li>${escapeHTML(i)}</li>`).join('')}</ul><h3>Gör så här</h3><ol>${r.steps.map(s=>`<li>${escapeHTML(s)}</li>`).join('')}</ol>${r.notes?`<h3>Extra tips</h3><p>${escapeHTML(r.notes)}</p>`:''}<div class="actions"><button class="btn" id="detailFav">${favorites.includes(id)?'Ta bort favorit':'Spara som favorit'}</button><button class="btn secondary" id="detailShop">Lägg ingredienser på inköpslistan</button><button class="btn secondary" id="detailEdit">Ändra recept</button><button class="btn ghost" id="detailDelete">Radera recept</button></div>`;$('#closeDetail').onclick=()=>$('#detail').classList.add('hidden');$('#detailFav').onclick=()=>toggleFavorite(id);$('#detailShop').onclick=()=>{r.ingredients.forEach(i=>addShopping(i));showPage('shopping')};$('#detailEdit').onclick=()=>{if(myRecipes.some(x=>x.id===id))editMyRecipe(id);else alert('Du kan ändra receptet genom att spara en egen kopia under Mina recept. De färdiga grundrecepten är låsta i den här versionen.')};$('#detailDelete').onclick=()=>deleteRecipe(id);$('#detail').scrollIntoView({behavior:'smooth',block:'start'})}
+function toggleFavorite(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];save();renderRecipes();renderFavorites();if(!$('#detail').classList.contains('hidden'))showRecipe(id)}
+function renderFavorites(){let list=allRecipes().filter(r=>favorites.includes(r.id));$('#favoriteRecipes').innerHTML=list.length?list.map(recipeCard).join(''):'<div class="panel" style="grid-column:1/-1"><p>Du har inga favoriter ännu.</p><p class="muted">Tryck på ♡ vid ett recept för att spara det här.</p><button class="btn" id="browseRecipes">Hitta recept</button></div>';bindCards($('#favoriteRecipes'));let browse=$('#browseRecipes');if(browse)browse.onclick=()=>showPage('recipes')}
+let editingRecipeId=null;
+function renderMyRecipes(){const root=$('#myRecipeList');root.innerHTML=myRecipes.length?myRecipes.map(r=>`<article class="recipe"><div class="recipe-art">📝</div><div class="recipe-body"><span class="pill">${escapeHTML(r.time||'Tid ej angiven')}</span><h3 style="margin-top:10px">${escapeHTML(r.name)}</h3><p class="muted">${r.ingredients.length} ingredienser · ${r.steps.length} steg</p><div class="actions"><button class="btn" data-open="${r.id}">Visa recept</button><button class="btn secondary" data-myedit="${r.id}">Ändra</button><button class="btn ghost" data-mydelete="${r.id}">Radera</button></div></div></article>`).join(''):'<div class="panel" style="grid-column:1/-1"><p>Du har inte sparat något eget recept ännu.</p><p class="muted">Fyll i formuläret ovan och tryck på Spara recept.</p></div>';bindCards(root)}
+function editMyRecipe(id){const r=myRecipes.find(x=>x.id===id);if(!r)return;editingRecipeId=id;$('#myName').value=r.name;$('#myTime').value=r.time==='Tid ej angiven'?'':r.time;$('#myIngredients').value=r.ingredients.join('\n');$('#mySteps').value=r.steps.join('\n');$('#myNotes').value=r.notes||'';$('#recipeForm').querySelector('[type="submit"]').textContent='💾 Spara ändringar';$('#recipeForm').querySelector('[type="reset"]').textContent='Avbryt ändring';$('#recipeForm').scrollIntoView({behavior:'smooth',block:'start'});$('#myName').focus()}
+function deleteRecipe(id){const r=allRecipes().find(x=>x.id===id);if(!r||!confirm(`Vill du radera receptet "${r.name}"?`))return;if(r.category==='egna')myRecipes=myRecipes.filter(x=>x.id!==id);else deletedRecipes=[...deletedRecipes,id];favorites=favorites.filter(x=>x!==id);save();renderMyRecipes();renderRecipes();renderFavorites();renderWeek();$('#detail').classList.add('hidden')}
+function escapeHTML(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('#recipeForm').addEventListener('submit',e=>{e.preventDefault();const name=$('#myName').value.trim(),ingredients=$('#myIngredients').value.split(/\n|,/).map(x=>x.trim()).filter(Boolean),steps=$('#mySteps').value.split(/\n/).map(x=>x.trim()).filter(Boolean);if(!name||!ingredients.length||!steps.length){alert('Fyll i receptnamn, ingredienser och instruktioner.');return}const item={id:editingRecipeId||'my-'+Date.now(),name,category:'egna',emoji:'📝',time:$('#myTime').value.trim()||'Tid ej angiven',ingredients,steps,notes:$('#myNotes').value.trim()};if(editingRecipeId){myRecipes=myRecipes.map(r=>r.id===editingRecipeId?item:r)}else{myRecipes.unshift(item)}editingRecipeId=null;save();$('#recipeForm').reset();$('#recipeForm').querySelector('[type="submit"]').textContent='💾 Spara recept';$('#recipeForm').querySelector('[type="reset"]').textContent='Rensa formuläret';renderMyRecipes();renderRecipes();renderFavorites();alert('Receptet är sparat!');$('#myRecipeList').scrollIntoView({behavior:'smooth',block:'start'})});
+$('#recipeForm').addEventListener('reset',()=>{editingRecipeId=null;setTimeout(()=>{$('#recipeForm').querySelector('[type="submit"]').textContent='💾 Spara recept';$('#recipeForm').querySelector('[type="reset"]').textContent='Rensa formuläret'},0)});
+function renderWeek(){let available=recipes.filter(r=>!deletedRecipes.includes(r.id));if(!available.length){$('#weekList').innerHTML='<p>Inga färdiga recept finns kvar. Lägg till egna recept eller återställ sidan.</p>';return}let days=['Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag','Söndag'];$('#weekList').innerHTML=days.map((d,i)=>{let r=available.find(x=>x.id===week[i])||available[0];week[i]=r.id;return `<div class="day"><strong>${d}</strong><div><b>${r.emoji} ${r.name}</b><div class="muted small">${r.time}</div></div><button class="btn ghost" data-change="${i}">Byt rätt</button></div>`}).join('');$('#weekList').querySelectorAll('[data-change]').forEach(b=>b.onclick=()=>{let i=+b.dataset.change;let current=week[i];let next=available[(available.findIndex(r=>r.id===current)+1)%available.length];week[i]=next.id;save();renderWeek()})}
+function addShopping(item){if(!shopping.some(x=>x.name.toLowerCase()===item.toLowerCase()))shopping.push({name:item,checked:false});save();renderShopping()}
+function renderShopping(){$('#shoppingItems').innerHTML=shopping.length?shopping.map((x,i)=>`<label class="checkline ${x.checked?'done':''}"><input type="checkbox" data-check="${i}" ${x.checked?'checked':''}><span>${x.name}</span></label>`).join(''):'<p class="muted">Listan är tom. Lägg till en vara eller välj ingredienser från ett recept.</p>';$('#shoppingItems').querySelectorAll('[data-check]').forEach(c=>c.onchange=()=>{shopping[+c.dataset.check].checked=c.checked;save();renderShopping()})}
+$('#addItem').onclick=()=>{let v=$('#newItem').value.trim();if(v){addShopping(v);$('#newItem').value=''}};$('#newItem').addEventListener('keydown',e=>{if(e.key==='Enter')$('#addItem').click()});
+$('#clearChecked').onclick=()=>{shopping=shopping.filter(x=>!x.checked);save();renderShopping()};
+$('#copyList').onclick=async()=>{let text=shopping.filter(x=>!x.checked).map(x=>'- '+x.name).join('\n');if(!text){alert('Det finns inga varor kvar att kopiera.');return}try{await navigator.clipboard.writeText(text);alert('Inköpslistan är kopierad!')}catch{prompt('Kopiera din inköpslista:',text)}};
+$('#weekShopping').onclick=()=>{week.forEach(id=>{let r=allRecipes().find(x=>x.id===id);if(r)r.ingredients.forEach(addShopping)});showPage('shopping')};
+$('#newWeek').onclick=()=>{let available=recipes.filter(r=>!deletedRecipes.includes(r.id));if(available.length){week=Array.from({length:7},()=>available[Math.floor(Math.random()*available.length)].id);save();renderWeek()}};
+$('#search').addEventListener('input',renderRecipes);$('#filter').addEventListener('change',renderRecipes);
+function findByPantry(){let words=$('#pantry').value.toLowerCase().split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);if(!words.length){alert('Skriv in minst en ingrediens först.');return}currentResults=allRecipes().map(r=>({...r,score:r.ingredients.reduce((n,i)=>n+(words.some(w=>i.toLowerCase().includes(w)||w.includes(i.toLowerCase().replace(/^\d+[\s–-]*/,'')))?1:0),0)})).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);$('#homeResults').innerHTML=`<div class="panel"><h2>Recept som passar dina ingredienser</h2>${currentResults.length?`<div class="results">${currentResults.slice(0,4).map(recipeCard).join('')}</div>`:'<p>Jag hittade ingen direkt match. Prova att skriva kortare ord, till exempel pasta, kyckling eller grädde.</p>'}</div>`;bindCards($('#homeResults'))}
+$('#findRecipes').onclick=findByPantry;$('#fillExample').onclick=()=>{$('#pantry').value='makaroner, falukorv, grädde';findByPantry()};
+$('#makeAI').onclick=()=>{let available=allRecipes();let words=$('#pantry').value.toLowerCase();let candidates=available.filter(r=>!words||r.ingredients.some(i=>words.split(/[,;\n]+/).some(w=>w.trim()&&i.toLowerCase().includes(w.trim()))));let r=candidates.sort(()=>Math.random()-.5)[0]||available[Math.floor(Math.random()*available.length)];if(!r){alert('Lägg till ett recept först.');return}$('#homeResults').innerHTML=`<div class="panel"><h2>✨ Ditt receptförslag</h2>${recipeCard(r)}<p class="notice" style="margin-top:12px">Detta är ett förslag från appens receptsamling, inte ett AI-svar från en ansluten tjänst. Kontrollera alltid att du har ingredienserna.</p></div>`;bindCards($('#homeResults'));$('#homeResults').scrollIntoView({behavior:'smooth'})};
+if(localSession){loadAccountData()}renderAccount();renderRecipes();renderWeek();renderShopping();renderFavorites();renderMyRecipes();if(!localSession)showPage('login-gate');
+</script>
+</body>
+</html>
