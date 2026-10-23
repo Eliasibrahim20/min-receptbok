@@ -171,8 +171,14 @@ input:focus,textarea:focus,select:focus,button:focus-visible {outline:3px solid 
  <p class="small muted">Första versionen · Dina favoriter och inköpslistan sparas i den här webbläsaren på den här enheten.</p>
 </main>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 <script>
-const recipes = [
+const supabaseClient = window.supabase.createClient(
+  'https://njeqjfcpjzacqbunomag.supabase.co',
+  'sb_publishable_5OlKkldkHmExxOlWRSxkyg_c5dYjsOM'
+);
+
+ const recipes = [
  {id:'creamy-pasta',name:'Krämig köttfärspasta',category:'pasta',emoji:'🍝',time:'25 min',servings:2,ingredients:['200 g pasta','250 g köttfärs','2 dl matgrädde','1 liten lök','2 msk tomatpuré','salt och peppar'],steps:['Koka pastan enligt förpackningen.','Hacka löken och stek den med köttfärsen tills köttet är genomstekt.','Rör ner tomatpuré och matgrädde. Låt sjuda i 5–7 minuter.','Smaka av med salt och peppar. Blanda med pastan.']},
  {id:'korvstroganoff',name:'Falukorvstroganoff',category:'korv',emoji:'🍲',time:'20 min',servings:2,ingredients:['300 g falukorv','1 liten lök','2 dl matgrädde','2 msk tomatpuré','2 portioner ris','lite olja'],steps:['Koka riset enligt förpackningen.','Skär falukorv och lök i bitar.','Stek lök och falukorv i lite olja.','Rör ner tomatpuré och grädde. Låt sjuda i 5 minuter.','Servera med ris.']},
  {id:'chicken',name:'Krämig kyckling med ris',category:'kyckling',emoji:'🍗',time:'30 min',servings:2,ingredients:['250–300 g kycklingfilé','2 dl matgrädde','1 liten lök','2 portioner ris','1 tsk buljong','lite olja'],steps:['Koka riset.','Skär kycklingen i mindre bitar. Tvätta händer och redskap efter rå kyckling.','Stek kycklingen tills den är helt genomstekt.','Tillsätt hackad lök, grädde och buljong. Låt sjuda 5–10 minuter.','Servera med ris.']},
