@@ -49,25 +49,43 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{
-              text: "Du är Min Receptboks AI-kock. Svara alltid på enkel och tydlig svenska. Hjälp användaren laga billig, god och enkel vardagsmat. Använd helst ingredienser användaren redan har. Ge recept med portionsantal, ingredienser och numrerade steg. Håll instruktionerna korta och tydliga. Fråga om en viktig sak saknas. Tänk på livsmedelssäkerhet."
-            }]
-          },
-          contents: [{ parts: [{ text: question.trim() }] }],
-          generationConfig: { maxOutputTokens: 900 }
-        }),
+    const requestBody = {
+      systemInstruction: {
+        parts: [{
+          text: "Du är Min Receptboks AI-kock. Svara alltid på enkel och tydlig svenska. Hjälp användaren laga billig, god och enkel vardagsmat. Använd helst ingredienser användaren redan har. Ge recept med portionsantal, ingredienser och numrerade steg. Håll instruktionerna korta och tydliga. Fråga om en viktig sak saknas. Tänk på livsmedelssäkerhet."
+        }]
       },
-    );
+      contents: [{ parts: [{ text: question }] }],
+      generationConfig: { maxOutputTokens: 900 }
+    };
+
+    const callGemini = async (model: string) => {
+      let lastResponse: Response | null = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        lastResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            body: JSON.stringify(requestBody),
+          },
+        );
+        if (lastResponse.ok || (lastResponse.status !== 503 && lastResponse.status !== 429)) {
+          return lastResponse;
+        }
+        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 1200));
+      }
+      return lastResponse!;
+    };
+
+    let response = await callGemini("gemini-3.8-flash");
+    if (response.status === 503 || response.status === 429) {
+      console.warn("Gemini 3.8 är upptagen. Provar reservmodell.");
+      response = await callGemini("gemini-3.5-flash-lite");
+    }
 
     const result = await response.json();
     if (!response.ok) {
