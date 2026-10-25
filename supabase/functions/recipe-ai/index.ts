@@ -71,9 +71,13 @@ Deno.serve(async (req: Request) => {
 
     const result = await response.json();
     if (!response.ok) {
-      console.error("Gemini API-fel:", result);
+      console.error("Gemini API-fel:", response.status, result);
+      const googleMessage =
+        typeof result?.error?.message === "string"
+          ? result.error.message
+          : "Okänt fel från Google Gemini.";
       return new Response(JSON.stringify({
-        error: "Google Gemini kunde inte svara. Kontrollera GEMINI_API_KEY och API-inställningarna."
+        error: "Google Gemini-fel (" + response.status + "): " + googleMessage
       }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
