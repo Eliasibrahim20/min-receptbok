@@ -1,0 +1,23 @@
+name: Deploy recipe-ai
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/functions/recipe-ai/**"
+      - ".github/workflows/deploy-recipe-ai.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Supabase Edge Function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          npx --yes supabase@latest functions deploy recipe-ai --project-ref njeqjfcpjzacqbunomag --use-api
