@@ -19,9 +19,23 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { question } = await req.json();
-    if (typeof question !== "string" || !question.trim() || question.length > 3000) {
-      return new Response(JSON.stringify({ error: "Skriv en fråga på högst 3000 tecken." }), {
+    const payload = await req.json().catch(() => ({}));
+    const candidate =
+      payload?.question ??
+      payload?.prompt ??
+      payload?.message ??
+      payload?.text ??
+      payload?.input ??
+      (typeof payload === "string" ? payload : null) ??
+      payload?.messages?.[payload.messages.length - 1]?.content ??
+      payload?.contents?.[0]?.parts?.[0]?.text;
+
+    const question = typeof candidate === "string" ? candidate.trim() : "";
+    if (!question || question.length > 3000) {
+      return new Response(JSON.stringify({
+        error: "Skriv en fråga på högst 3000 tecken.",
+        received: Object.keys(payload || {}),
+      }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
