@@ -60,25 +60,17 @@ Deno.serve(async (req: Request) => {
     };
 
     const callGemini = async (model: string) => {
-      let lastResponse: Response | null = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        lastResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": apiKey,
-            },
-            body: JSON.stringify(requestBody),
+      return await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
           },
-        );
-        if (lastResponse.ok || (lastResponse.status !== 503 && lastResponse.status !== 429)) {
-          return lastResponse;
-        }
-        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 1200));
-      }
-      return lastResponse!;
+          body: JSON.stringify(requestBody),
+        },
+      );
     };
 
     let response = await callGemini("gemini-3.8-flash");
